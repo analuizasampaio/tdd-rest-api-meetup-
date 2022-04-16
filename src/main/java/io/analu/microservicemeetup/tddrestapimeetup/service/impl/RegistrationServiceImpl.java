@@ -6,6 +6,8 @@ import io.analu.microservicemeetup.tddrestapimeetup.repository.RegistrationRepos
 import io.analu.microservicemeetup.tddrestapimeetup.service.RegistrationService;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class RegistrationServiceImpl implements RegistrationService {
     RegistrationRepository repository ;
@@ -20,5 +22,10 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
 
         return repository.save(registration);
+    }
+
+    @Override
+    public Optional<Registration> getRegistrationById(Integer id) {
+        return this.repository.findById(id);
     }
 }

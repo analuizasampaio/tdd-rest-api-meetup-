@@ -19,6 +19,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
@@ -80,5 +81,34 @@ public class RegistrationServiceTest {
                 .hasMessage("Registration already created!");
 
         Mockito.verify(repository, Mockito.never()).save(registration);
+    }
+
+    @Test
+    @DisplayName("Deve ter somente um registro por Id")
+    public void getByRegistrationId(){
+        Integer id = 11;
+        Registration registration = createValidRegistration();
+        registration.setId(id);
+        Mockito.when(repository.findById(id))
+                .thenReturn(Optional.of(registration));
+
+        //execucao
+        Optional<Registration> foundRegistration = registrationService.getRegistrationById(id);
+
+        //asserts
+        assertThat(foundRegistration.isPresent())
+                .isTrue();
+
+        assertThat(foundRegistration.get().getId())
+                .isEqualTo(id);
+
+        assertThat(foundRegistration.get().getName())
+                .isEqualTo(registration.getName());
+
+        assertThat(foundRegistration.get().getDateOfRegistration())
+                .isEqualTo(registration.getDateOfRegistration());
+
+        assertThat(foundRegistration.get().getRegistration())
+                .isEqualTo(registration.getRegistration());
     }
 }
