@@ -1,10 +1,12 @@
 package io.analu.microservicemeetup.tddrestapimeetup.service;
 
+import io.analu.microservicemeetup.tddrestapimeetup.exception.BusinessException;
 import io.analu.microservicemeetup.tddrestapimeetup.model.entity.Registration;
 import io.analu.microservicemeetup.tddrestapimeetup.repository.RegistrationRepository;
 import io.analu.microservicemeetup.tddrestapimeetup.service.impl.RegistrationServiceImpl;
 
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -62,5 +64,21 @@ public class RegistrationServiceTest {
                 .dateOfRegistration(LocalDate.now())
                 .registration("001")
                 .build();
+    }
+
+    @Test
+    @DisplayName("Deve retornar business error para registrados duplicados")
+    public void shouldNotSaveRegistrationDuplicated(){
+
+        Registration registration = createValidRegistration();
+        Mockito.when(repository.existsByRegistration(Mockito.any()))
+                .thenReturn(true);
+
+        Throwable exception = Assertions.catchThrowable(()-> registrationService.save(registration));
+        assertThat(exception)
+                .isInstanceOf(BusinessException.class)
+                .hasMessage("Registration already created!");
+
+        Mockito.verify(repository, Mockito.never()).save(registration);
     }
 }
